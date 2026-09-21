@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f6e3df" />
+    <meta name="description" content="Follow Quran recitation live with synchronized verses and trusted English translation." />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://verses.quran.foundation" crossorigin />
+    <link rel="preload" href="https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2" as="font" type="font/woff2" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&amp;family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css?v=29" />
+    <title>AyahFlow — Live Quran Companion</title>
+  </head>
+  <body class="app-booting">
+    <div class="startup-screen" id="startupScreen" role="status" aria-live="polite" aria-label="AyahFlow is loading">
+      <div class="startup-inner">
+        <span class="startup-mark" aria-hidden="true">
+          <svg viewBox="0 0 64 64" fill="none">
+            <path d="M31 11c-11.5 0-20.8 9.3-20.8 20.8 0 12.1 9.8 22 22 22 8.2 0 15.4-4.6 19.2-11.4a23.5 23.5 0 0 1-12.8 3.9c-12.3 0-22.2-10-22.2-22.2 0-3.3.7-6.4 2-9.2A20.6 20.6 0 0 1 31 11Z" fill="currentColor"/>
+            <path d="m45 15 1.5 4.1 4.2 1.5-4.2 1.4-1.5 4.2-1.4-4.2-4.2-1.4 4.2-1.5L45 15Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <div class="startup-wordmark">Ayah<span>Flow</span></div>
+        <p>Preparing the Qur’an</p>
+        <span class="startup-progress" aria-hidden="true"><i></i></span>
+      </div>
+    </div>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="AyahFlow home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none"><path d="M16 3.8C10.2 3.8 5.5 8.5 5.5 14.3c0 6.2 5 11.1 11.1 11.1 4.2 0 7.8-2.3 9.7-5.7a11.9 11.9 0 0 1-6.4 1.9A11.2 11.2 0 0 1 8.7 10.4c0-1.6.4-3.2 1-4.6A10.4 10.4 0 0 1 16 3.8Z" fill="currentColor"/><path d="m22.8 6.2.7 2.1 2.2.7-2.2.7-.7 2.1-.7-2.1-2.2-.7 2.2-.7.7-2.1Z" fill="currentColor"/></svg>
+        </span>
+        <span>Ayah<span>Flow</span></span>
+      </a>
+      <div class="header-actions">
+        <button class="header-button" id="searchButton" aria-label="Search the Quran">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><span>Search</span>
+        </button>
+        <button class="header-button" id="libraryButton" aria-label="Open bookmarks and history">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v16l-6-4-6 4V4Z"/></svg><span>Saved</span>
+        </button>
+        <button class="header-button install-button" id="installButton" hidden aria-label="Install AyahFlow">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 19h14"/></svg><span>Install</span>
+        </button>
+        <button class="icon-button" id="themeButton" aria-label="Switch color theme" title="Switch color theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <nav class="reader-quick-nav" id="readerQuickNav" aria-label="Quick Quran navigation" aria-hidden="true" inert>
+      <div class="reader-quick-row">
+        <button class="quick-icon-button" id="quickMenuButton" type="button" aria-label="Open reader menu" aria-expanded="false" aria-controls="quickReaderPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <button class="quick-location" id="quickLocationButton" type="button" aria-label="Choose a Surah and ayah" aria-expanded="false" aria-controls="quickReaderPanel">
+          <strong id="quickLocationTitle">Al-Fatihah</strong>
+          <span id="quickLocationMeta">1:1 · Page 1</span>
+        </button>
+        <button class="quick-icon-button" id="quickSearchButton" type="button" aria-label="Search the Quran">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+        </button>
+        <button class="quick-icon-button" id="quickSavedButton" type="button" aria-label="Open saved verses">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h12v16l-6-4-6 4V4Z"/></svg>
+        </button>
+      </div>
+      <div class="quick-reader-panel" id="quickReaderPanel" hidden>
+        <form class="quick-verse-picker" id="quickVersePicker">
+          <label><span>Surah</span><select id="quickSurahSelect" aria-label="Choose a Surah"></select></label>
+          <label><span>Ayah</span><select id="quickAyahSelect" aria-label="Choose an ayah"></select></label>
+          <button class="quick-go-button" type="submit">Go</button>
+        </form>
+        <div class="quick-reader-settings" aria-label="Reader settings">
+          <div class="quick-view-switch" role="group" aria-label="Quran reading view">
+            <button class="active" id="quickAyahViewButton" type="button" aria-pressed="true">Ayah</button>
+            <button id="quickMushafViewButton" type="button" aria-pressed="false">Mushaf</button>
+          </div>
+          <button class="quick-tajweed-button active" id="quickTajweedButton" type="button" aria-pressed="true" disabled>
+            <span class="tajweed-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+            Tajweed
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="app-shell">
+      <aside class="control-panel" aria-label="Recitation controls">
+        <div class="eyebrow">Recitation</div>
+        <h1>Quran <em>reader</em></h1>
+        <p class="intro">Recite, or choose an ayah below.</p>
+
+        <div class="mode-switch" role="tablist" aria-label="Recitation mode">
+          <button class="active" id="followModeButton" role="tab" aria-selected="true">Follow recitation</button>
+          <button id="practiceModeButton" role="tab" aria-selected="false">Practice an ayah</button>
+        </div>
+
+        <div class="calligraphy-card" lang="ar" dir="rtl">
+          <span class="calligraphy-arabic">وَرَتِّلِ ٱلْقُرْءَانَ تَرْتِيلًا</span>
+          <strong class="calligraphy-translation" lang="en" dir="ltr">“And recite the Qur’an with measured recitation.”</strong>
+          <small lang="en" dir="ltr">Al-Muzzammil · 73:4</small>
+        </div>
+
+        <div class="listen-zone">
+          <button class="listen-button" id="listenButton" aria-label="Start listening to Quran recitation" aria-pressed="false">
+            <span class="pulse-ring ring-one"></span>
+            <span class="pulse-ring ring-two"></span>
+            <span class="listen-core">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8"/></svg>
+            </span>
+          </button>
+          <div class="listen-copy">
+            <strong id="listenLabel">Tap to listen</strong>
+            <span id="listenHint">Allow microphone access when asked</span>
+          </div>
+          <div class="waveform" id="waveform" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+
+        <details class="recitation-options" id="recitationOptions">
+          <summary>Recitation options</summary>
+          <div class="recitation-options-body">
+            <div class="mistake-control" id="mistakeControl">
+              <div class="mistake-control-copy">
+                <strong>Mistake detection</strong>
+                <span id="mistakeDetectionNote">Flags possible skipped or changed words</span>
+              </div>
+              <label class="switch" aria-label="Turn mistake detection on or off">
+                <input type="checkbox" id="mistakeDetectionToggle" role="switch" />
+                <span class="switch-track" aria-hidden="true"><i></i></span>
+              </label>
+            </div>
+
+            <button class="demo-button" id="demoButton">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6v12Z"/></svg>
+              Try guided demo
+            </button>
+          </div>
+        </details>
+
+        <div class="practice-summary" id="practiceSummary" hidden>
+          <strong id="practiceScore">Ready when you are</strong>
+          <span id="practiceHint">Recite the selected ayah and AyahFlow will mark the words it hears.</span>
+        </div>
+
+        <div class="divider"><span>Choose an ayah</span></div>
+
+        <form class="verse-picker" id="versePicker">
+          <label>
+            <span>Surah</span>
+            <select id="surahSelect" aria-label="Choose a surah">
+              <option value="1">1. Al-Fatihah</option>
+            </select>
+          </label>
+          <label>
+            <span>Ayah</span>
+            <select id="ayahSelect" aria-label="Choose an ayah">
+              <option value="1">1</option>
+            </select>
+          </label>
+          <button type="submit" aria-label="Go to selected verse">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </form>
+
+        <div class="privacy-note">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <span><strong>Private:</strong> your audio is never saved.</span>
+        </div>
+      </aside>
+
+      <section class="reader-panel" aria-label="Quran reader">
+        <div class="reader-topline">
+          <div class="surah-identity">
+            <span class="surah-number" id="surahNumber">01</span>
+            <div>
+              <p id="surahType">Meccan · 7 ayahs</p>
+              <h2 id="surahName">Al-Fatihah</h2>
+            </div>
+          </div>
+          <div class="reader-view-switch" role="group" aria-label="Quran reading view">
+            <button class="active" id="ayahViewButton" type="button" aria-pressed="true">Ayah</button>
+            <button id="mushafViewButton" type="button" aria-pressed="false">Mushaf</button>
+          </div>
+          <div class="reader-tools">
+            <details class="reader-options">
+              <summary>Reader options</summary>
+              <div class="reader-options-menu">
+                <label class="mushaf-page-picker" id="mushafPagePicker" hidden>
+                  <span>Mushaf page</span>
+                  <input id="mushafPageInput" type="number" min="1" max="604" value="1" inputmode="numeric" aria-label="Go to Mushaf page" />
+                </label>
+                <label class="translation-picker" id="translationPicker">
+                  <span>Translation</span>
+                  <select id="translationSelect" aria-label="Choose English translation">
+                    <option value="study.easy">Contextual English · brackets + context</option>
+                    <option value="en.sahih">Saheeh International</option>
+                    <option value="en.pickthall">M. M. Pickthall</option>
+                    <option value="en.asad">Muhammad Asad</option>
+                    <option value="en.itani">Clear Qur'an · Talal Itani</option>
+                  </select>
+                </label>
+                <div class="reader-option-buttons">
+                  <button class="tool-button tajweed-toggle active" id="tajweedButton" aria-label="Turn tajweed colors off" aria-pressed="true" title="Tajweed colors">
+                    <span class="tajweed-icon" aria-hidden="true"><i></i><i></i><i></i></span>
+                    Tajweed
+                  </button>
+                  <button class="tool-button" id="decreaseText" aria-label="Decrease text size">A−</button>
+                  <button class="tool-button" id="increaseText" aria-label="Increase text size">A+</button>
+                </div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="session-strip" id="sessionStrip" role="status" aria-live="polite">
+          <span class="session-dot"></span>
+          <span id="sessionMessage">Ready to listen</span>
+          <span class="confidence" id="confidenceLabel">Quran data loading…</span>
+        </div>
+
+        <div class="mistake-legend" id="mistakeLegend" aria-live="polite" hidden>
+          <span><i class="mistake-heard"></i> Heard</span>
+          <span><i class="mistake-check"></i> Possible mistake</span>
+          <strong id="mistakeStatus">Ready when you are</strong>
+        </div>
+
+        <details class="tajweed-legend" id="tajweedLegend">
+          <summary>Tajweed color guide</summary>
+          <div class="tajweed-legend-grid">
+            <span class="legend-item"><i class="legend-madd-necessary"></i><span><strong>Madd · 6</strong><small>Necessary prolongation</small></span></span>
+            <span class="legend-item"><i class="legend-madd-obligatory"></i><span><strong>Madd · 4 or 5</strong><small>Obligatory prolongation</small></span></span>
+            <span class="legend-item"><i class="legend-madd-permissible"></i><span><strong>Madd · 2, 4, or 6</strong><small>Permissible prolongation</small></span></span>
+            <span class="legend-item"><i class="legend-madd-normal"></i><span><strong>Madd · 2</strong><small>Normal prolongation</small></span></span>
+            <span class="legend-item"><i class="legend-ghunnah"></i><span><strong>Ghunnah</strong><small>Nasalization</small></span></span>
+            <span class="legend-item"><i class="legend-qalqalah"></i><span><strong>Qalqalah</strong><small>Echoing sound</small></span></span>
+            <span class="legend-item"><i class="legend-ikhafa"></i><span><strong>Ikhafa</strong><small>Hidden nūn or tanwīn</small></span></span>
+            <span class="legend-item"><i class="legend-ikhafa-shafawi"></i><span><strong>Ikhafa Shafawi</strong><small>Hidden mīm</small></span></span>
+            <span class="legend-item"><i class="legend-iqlab"></i><span><strong>Iqlab</strong><small>Nūn changed to mīm</small></span></span>
+            <span class="legend-item"><i class="legend-idgham-ghunnah"></i><span><strong>Idgham + Ghunnah</strong><small>Assimilation with nasalization</small></span></span>
+            <span class="legend-item"><i class="legend-idgham-no-ghunnah"></i><span><strong>Idgham</strong><small>Without nasalization</small></span></span>
+            <span class="legend-item"><i class="legend-idgham-shafawi"></i><span><strong>Idgham Shafawi</strong><small>Mīm assimilation</small></span></span>
+            <span class="legend-item"><i class="legend-idgham-similar"></i><span><strong>Similar letters</strong><small>Near-point assimilation</small></span></span>
+            <span class="legend-item"><i class="legend-silent"></i><span><strong>Silent</strong><small>Unpronounced letter</small></span></span>
+          </div>
+        </details>
+
+        <div class="transcript-card" id="transcriptCard" hidden>
+          <div><span id="heardLabel">Recitation heard</span><button id="clearTranscript" aria-label="Clear heard text">Clear</button></div>
+          <p id="transcriptText" lang="ar" dir="rtl"></p>
+          <div class="candidate-row" id="candidateRow" hidden>
+            <span id="candidateText"></span>
+            <button id="confirmCandidate">Open match</button>
+          </div>
+        </div>
+
+        <div class="verses" id="verses" aria-label="Quran reader">
+          <div class="loading-card">
+            <span class="loading-line wide"></span>
+            <span class="loading-line"></span>
+            <span class="loading-line wide"></span>
+          </div>
+        </div>
+
+        <div class="reader-footer">
+          <button id="previousAyah" aria-label="Previous verse">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+            <span id="previousLabel">Previous</span>
+          </button>
+          <span id="readerPosition">1 / 7</span>
+          <button id="nextAyah" aria-label="Next verse">
+            <span id="nextLabel">Next</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <button class="floating-listen" id="floatingListenButton" type="button" aria-label="Start listening to Quran recitation" aria-pressed="false" aria-hidden="true" tabindex="-1">
+      <span class="floating-listen-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8"/></svg>
+      </span>
+      <span id="floatingListenLabel">Listen</span>
+    </button>
+
+    <dialog class="app-dialog search-dialog" id="searchDialog">
+      <div class="dialog-head"><div><span>Search</span><h2>Find an ayah</h2></div><button class="close-button" data-close="searchDialog" aria-label="Close search">×</button></div>
+      <label class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="searchInput" type="search" placeholder="Search Arabic, English, or a surah…" autocomplete="off" /></label>
+      <p class="dialog-note">Try “mercy”, “Al-Kahf”, “2:255”, or Arabic words.</p>
+      <div class="search-results" id="searchResults"><p class="empty-state">Start typing to search all 6,236 verses.</p></div>
+    </dialog>
+
+    <dialog class="app-dialog saved-dialog" id="savedDialog">
+      <div class="dialog-head"><div><span>Saved verses</span><h2>Saved & recently opened</h2></div><button class="close-button" data-close="savedDialog" aria-label="Close saved items">×</button></div>
+      <div class="saved-tabs"><button class="active" data-saved-tab="bookmarks">Bookmarks <span id="bookmarkCount">0</span></button><button data-saved-tab="history">History</button></div>
+      <div id="savedItems" class="saved-items"></div>
+    </dialog>
+
+    <dialog class="app-dialog tafsir-dialog" id="tafsirDialog">
+      <div class="dialog-head"><div><span>Ayah study</span><h2 id="tafsirTitle">Meaning &amp; context</h2></div><button class="close-button" data-close="tafsirDialog" aria-label="Close ayah study">×</button></div>
+      <div class="tafsir-body" id="tafsirBody"><p class="empty-state">Loading translations and commentary…</p></div>
+      <footer class="tafsir-source"><strong>Named published translations · Ibn Kathir (Abridged)</strong><span>Translations and commentary remain separate and attributed.</span></footer>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script>window.setTimeout(function(){var screen=document.getElementById("startupScreen");if(screen){screen.classList.add("is-leaving");document.body.classList.remove("app-booting");}},8000);</script>
+    <script src="./recitation-core.js?v=29" defer></script>
+    <script src="./app.js?v=29" defer></script>
+  </body>
+</html>

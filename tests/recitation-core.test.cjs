@@ -1,0 +1,32 @@
+const test=require("node:test");
+const assert=require("node:assert/strict");
+const core=require("../dist/recitation-core.js");
+
+const verse=(text,surah=1,numberInSurah=1)=>({text,surah,numberInSurah,normalized:core.normalizeArabic(text),tokens:core.tokenize(text)});
+
+test("normalizes Quranic marks and hamza forms",()=>assert.equal(core.normalizeArabic("إِنَّا أَعْطَيْنَاكَ"),"انا اعطيناك"));
+test("normalizes ta marbuta and alef maqsura",()=>assert.equal(core.normalizeArabic("رَحْمَةٌ هُدَى"),"رحمه هدي"));
+test("matches Uthmani standalone hamza-alif spelling to modern recognition",()=>assert.equal(core.normalizeArabic("بِالْـَٔاخِرَةِ"),"بالاخره"));
+test("removes a duplicated Bismillah before another surah's first ayah",()=>assert.equal(core.stripLeadingBismillah("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ الٓمٓ",2,1),"الٓمٓ"));
+test("keeps Al-Fatihah's first ayah",()=>assert.equal(core.stripLeadingBismillah("بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ",1,1),"بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ"));
+test("turns spoken disconnected-letter names into one token",()=>assert.deepEqual(core.tokenize("ألف لام ميم ذلك الكتاب"),["الم","ذلك","الكتاب"]));
+test("indexes a leading conjunction variant",()=>assert.deepEqual(core.tokenVariants("واليوم"),["واليوم","اليوم"]));
+test("indexes two leading Arabic clitics",()=>assert.ok(core.tokenVariants("فبالحق").includes("الحق")));
+test("matches an exact Arabic word",()=>assert.equal(core.tokensMatch("الرحمن","الرحمن"),true));
+test("matches a recognizer substring without diacritics",()=>assert.equal(core.tokensMatch("وبالاخرة","الاخرة"),true));
+test("allows one edit for a long recognition token",()=>assert.equal(core.tokensMatch("المستقيم","المستقیم"),true));
+test("does not fuzzy-match short unrelated words",()=>assert.equal(core.tokensMatch("من","ما"),false));
+test("tracks words in their recited order",()=>assert.deepEqual(core.orderedWordProgress(["مالك","يوم","الدين"],["مالك","يوم","الدين"]),{matched:3,last:2,ratio:1}));
+test("resumes progress near the current word",()=>assert.equal(core.orderedWordProgress(["الدين"],["مالك","يوم","الدين"],2).last,2));
+test("a repeated earlier word cannot lower saved progress",()=>{const heard=core.orderedWordProgress(["مالك"],["مالك","يوم","الدين"],2);assert.equal(Math.max(2,heard.last),2);});
+test("finds a connected phrase with one recognizer gap",()=>assert.equal(core.contiguousMatch(["الحمد","رب","العالمين"],["الحمد","لله","رب","العالمين"]).matched,3));
+test("merges split iPhone recognition fragments",()=>assert.equal(core.mergeRollingTranscript("وكواعب اترابا","وكاسا دهاقا"),"وكواعب اترابا وكاسا دهاقا"));
+test("deduplicates cumulative recognition text",()=>assert.equal(core.mergeRollingTranscript("الحمد لله","لله رب العالمين"),"الحمد لله رب العالمين"));
+test("does not append a repeated final result",()=>assert.equal(core.mergeRollingTranscript("مالك يوم الدين","مالك يوم الدين"),"مالك يوم الدين"));
+test("limits the rolling transcript",()=>assert.equal(core.mergeRollingTranscript("واحد اثنان ثلاثة اربعة","خمسة ستة",4).split(" ").length,4));
+test("chooses the recognition alternative that fits the expected ayah",()=>{const target=verse("مَالِكِ يَوْمِ الدِّينِ");const chosen=core.chooseAlternative([{transcript:"مالك يوم الطين"},{transcript:"مالك يوم الدين"}],text=>core.scoreVerse(text,target).score);assert.equal(chosen,"مالك يوم الدين");});
+test("scores the correct ayah above an unrelated ayah",()=>{const query="اياك نعبد واياك نستعين",correct=verse("إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ",1,5),wrong=verse("مَالِكِ يَوْمِ الدِّينِ",1,4);assert.ok(core.scoreVerse(query,correct).score>core.scoreVerse(query,wrong).score);});
+test("requires a clear phrase for a longer ayah",()=>{const target=verse("صراط الذين انعمت عليهم غير المغضوب عليهم ولا الضالين");assert.equal(core.matchEvidence("صراط الذين",target).enough,false);assert.equal(core.matchEvidence("صراط الذين انعمت",target).enough,true);});
+test("accepts both words of a short next ayah",()=>{const target=verse("وكاسا دهاقا",78,34),evidence=core.matchEvidence("وكاسا دهاقا",target);assert.equal(evidence.enough,true);assert.equal(evidence.exactPhrase,true);});
+test("split fragments identify the next short ayah after merging",()=>{const current=verse("وكواعب اترابا",78,33),next=verse("وكاسا دهاقا",78,34),heard=core.mergeRollingTranscript("وكواعب اترابا","وكاسا دهاقا");assert.ok(core.scoreVerse(heard,next).score>.35);assert.equal(core.matchEvidence(heard,next).enough,true);assert.ok(core.scoreVerse(heard,next).score>=core.scoreVerse(heard,current).score-.2);});
+test("a shared single word is not enough to jump into a longer ayah",()=>{const target=verse("الذين هم عن صلاتهم ساهون",107,5);assert.equal(core.matchEvidence("الذين",target).enough,false);});

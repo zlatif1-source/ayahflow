@@ -1,0 +1,13 @@
+{
+  "name": "ayahflow",
+  "version": "1.0.0",
+  "private": true,
+  "description": "An installable Quran reader with recitation following, tajweed, translations, tafsir, and a continuous Mushaf.",
+  "scripts": {
+    "test": "node --test tests/app-contract.test.cjs tests/recitation-core.test.cjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

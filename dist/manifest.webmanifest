@@ -1,0 +1,10 @@
+{
+  "name": "AyahFlow — Live Quran Companion",
+  "short_name": "AyahFlow",
+  "description": "Follow Quran recitation live with synchronized verses and English translation.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f8efec",
+  "theme_color": "#f6e3df",
+  "icons": [{ "src": "./favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
