@@ -140,6 +140,66 @@ button:focus-visible, a:focus-visible, summary:focus-visible, select:focus-visib
 
 .reader-quick-nav { display: none; }
 
+.ornamental-frame { display: none; }
+
+@media (min-width: 1660px) {
+  .ornamental-frame {
+    position: fixed;
+    z-index: 0;
+    top: 84px;
+    bottom: 20px;
+    left: max(22px, calc((100vw - 1620px) / 2));
+    right: max(22px, calc((100vw - 1620px) / 2));
+    border: 1px solid rgba(141, 80, 89, .25);
+    border-radius: 18px;
+    display: block;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 6px rgba(255, 252, 250, .16);
+  }
+  .ornamental-frame::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    border: 1px solid rgba(184, 138, 104, .13);
+    border-radius: 12px;
+  }
+  .frame-phrase {
+    position: absolute;
+    top: 50%;
+    min-width: 8.25rem;
+    padding: .55rem 1rem .4rem;
+    background: #f5e9e5;
+    color: rgba(118, 67, 75, .48);
+    font-family: "Uthmanic Hafs", "Amiri Quran", serif;
+    font-size: 2.15rem;
+    font-weight: 400;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 1px rgba(255,255,255,.7);
+  }
+  .frame-phrase-left {
+    left: 0;
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
+  .frame-phrase-right {
+    right: 0;
+    transform: translate(50%, -50%) rotate(90deg);
+  }
+  .frame-rosette {
+    position: absolute;
+    left: 50%;
+    padding: .05rem .8rem;
+    background: #f5e9e5;
+    color: rgba(141, 80, 89, .52);
+    font-size: .9rem;
+    line-height: 1;
+    transform: translateX(-50%);
+  }
+  .frame-rosette-top { top: -.48rem; }
+  .frame-rosette-bottom { bottom: -.48rem; }
+}
+
 .app-shell {
   position: relative;
   z-index: 1;
